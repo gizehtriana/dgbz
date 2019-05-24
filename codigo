@@ -1,0 +1,36 @@
+# Importación librerías: Pandas y Sklearn
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+col_names=['Edad', 'Sexo', 'CP' , 'Trestbps', 'Col', 'FBS' , 'Restcg' , 'Thalach', 'Exang', 'Oldpeak', 'Slope', 'Ca', 'Thal', 'Target']
+pima=pd.read_csv("heart.csv", names=col_names,header=0)
+pima.head() # Head visualiza los primeros 5 elementos de la tabla
+
+variables_independientes=['Edad', 'Trestbps', 'Col', 'Thalach', 'Exang', 'Oldpeak', 'Thal']
+X=pima[variables_independientes]
+Y=pima.Target
+X_train, X_test, y_train, y_test = train_test_split(X,Y, test_size=0.3, random_state=1)
+print(len(X))
+print(len(X_train))
+print(len(X_test)) # Verificamos que haya sido un split del 70 %
+
+clf=DecisionTreeClassifier()
+clf=clf.fit(X_train,y_train)
+y_pred=clf.predict(X_test)
+print('Accuracy',metrics.accuracy_score(y_test, y_pred))
+
+
+# Train Decision Tree Classifer
+from sklearn.tree import export_graphviz
+from sklearn.externals.six import StringIO  
+from IPython.display import Image  
+import pydotplus
+
+dot_data = StringIO()
+export_graphviz(clf, out_file=dot_data,  
+                filled=True, rounded=True,
+                special_characters=True,feature_names = variables_independientes,class_names=['0','1'])
+graph = pydotplus.graph_from_dot_data(dot_data.getvalue())  
+graph.write_png('heart.png')
+Image(graph.create_png())
